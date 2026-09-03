@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kalkulator limitu pracy tymczasowej 18/36 zgodny z art. 20 ustawy o zatrudnianiu pracowników tymczasowych">
+    <meta name="theme-color" content="#4CAF50">
     <title>Kalkulator Limitu Pracy Tymczasowej 18/36</title>
+    <link rel="icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
     <style>
-        /* Ultra nowoczesny design */
         :root {
             --primary-color: #4CAF50;
+            --primary-dark: #388E3C;
             --secondary-color: #8BC34A;
             --danger-color: #F44336;
+            --warn-color: #FF9800;
             --light-bg: #F5F5F5;
-            --dark-bg: #212121;
             --text-color: #212121;
             --font-family: 'Roboto', sans-serif;
         }
@@ -25,11 +28,12 @@
             background-color: var(--light-bg);
             color: var(--text-color);
             margin: 0;
-            padding: 0;
+            padding: 24px 12px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         .container {
@@ -44,15 +48,27 @@
         h1 {
             color: var(--primary-color);
             text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+            font-size: 2.2rem;
+            margin: 0 0 12px;
+        }
+
+        .info-box {
+            background-color: #E8F5E9;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            margin-bottom: 24px;
         }
 
         .btn-group {
-            margin-top: 20px;
+            margin-top: 4px;
+            margin-bottom: 24px;
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 12px;
         }
 
         button {
@@ -60,8 +76,9 @@
             border: none;
             border-radius: 8px;
             font-size: 1rem;
+            font-family: var(--font-family);
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .btn-add {
@@ -70,7 +87,7 @@
         }
 
         .btn-add:hover {
-            background-color: #388E3C;
+            background-color: var(--primary-dark);
         }
 
         .btn-install {
@@ -86,56 +103,113 @@
         }
 
         .btn-install img {
-            max-width: 100%;
-            height: auto;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
         }
 
-        .limit-selector {
-            margin-top: 20px;
-            text-align: center;
+        .btn-calculate {
+            background-color: var(--primary-dark);
+            color: white;
+            font-weight: 500;
         }
 
-        .limit-selector select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
+        .btn-calculate:hover {
+            background-color: #2E7D32;
+        }
+
+        .btn-remove {
+            background-color: #FFEBEE;
+            color: var(--danger-color);
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+
+        .btn-remove:hover {
+            background-color: #FFCDD2;
+        }
+
+        .btn-remove-person {
+            background-color: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .btn-remove-person:hover {
+            background-color: #FFEBEE;
+        }
+
+        .btn-clear {
+            background-color: #EEEEEE;
+            color: #616161;
+        }
+
+        .btn-clear:hover {
+            background-color: #E0E0E0;
         }
 
         .person-section {
             margin-bottom: 30px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 20px;
             background-color: #fff;
         }
 
         .person-header {
             display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 8px;
         }
 
-        .person-header input {
+        .person-header input[type="text"] {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 1rem;
-            width: 100%;
+            flex: 1 1 220px;
             box-sizing: border-box;
+        }
+
+        .zastepstwo-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .zastepstwo-label input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        .person-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 8px;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
         }
 
         th, td {
-            padding: 15px;
+            padding: 12px 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            white-space: nowrap;
         }
 
         th {
@@ -144,44 +218,16 @@
             font-weight: 500;
         }
 
-        td {
-            background-color: #fff;
-        }
-
         td:last-child {
             text-align: center;
         }
 
-        .results-section {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            background-color: var(--light-bg);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .result-ok {
-            background-color: #E8F5E9;
-            color: var(--primary-color);
-        }
-
-        .result-exceeded {
-            background-color: #FFEBEE;
-            color: var(--danger-color);
-        }
-
-        .highlight {
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .flatpickr-input {
+        .flatpickr-input, .flat-date {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 1rem;
-            width: 100%;
+            width: 130px;
             box-sizing: border-box;
             transition: border-color 0.3s ease;
         }
@@ -192,192 +238,426 @@
             box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
         }
 
-        .limit-selector {
-            margin-top: 20px;
-            text-align: center;
+        .flatpickr-input.invalid {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 5px rgba(244, 67, 54, 0.4);
         }
 
-        .limit-selector select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+        .results-section {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
             font-size: 1rem;
-            cursor: pointer;
+            background-color: var(--light-bg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .result-ok {
+            background-color: #E8F5E9;
+        }
+
+        .result-exceeded {
+            background-color: #FFEBEE;
+        }
+
+        .result-warn {
+            background-color: #FFF3E0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .badge-ok { background-color: var(--primary-color); }
+        .badge-exceeded { background-color: var(--danger-color); }
+        .badge-warn { background-color: var(--warn-color); }
+
+        .result-line {
+            margin: 6px 0;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        .text-danger { color: var(--danger-color); }
+        .text-warn { color: #E65100; }
+
+        .error-list, .warning-list {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .error-list li { color: var(--danger-color); }
+        .warning-list li { color: #E65100; }
+
+        .ranges-list {
+            margin: 6px 0 0;
+            padding-left: 20px;
+            font-size: 0.9rem;
+            color: #444;
+        }
+
+        footer {
+            margin-top: 28px;
+            font-size: 0.8rem;
+            color: #777;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 640px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Kalkulator Limitu Pracy Tymczasowej 18/36</h1>
+        <div class="info-box">
+            Zgodnie z <strong>art. 20 ustawy z dnia 9 lipca 2003 r. o zatrudnianiu pracowników tymczasowych</strong>
+            (t.j. Dz. U. 2025 poz. 236) ta sama osoba może wykonywać pracę tymczasową na rzecz jednego
+            pracodawcy użytkownika przez okres <strong>nieprzekraczający łącznie 18 miesięcy w każdym ruchomym oknie
+            36 kolejnych miesięcy</strong> — łącznie dla wszystkich agencji i form zatrudnienia (umowa o pracę
+            oraz umowy cywilnoprawne). Miesiąc kalendarzowy, w którym praca była wykonywana choćby jeden dzień,
+            liczy się jako pełny miesiąc.
+        </div>
         <div class="btn-group">
             <button class="btn-add" onclick="addPerson()">+ Dodaj Osobę</button>
-            <button class="btn-install" onclick="installApp()">
-                <img src="icon.png" alt="Ikona aplikacji">
+            <button class="btn-clear" onclick="clearAll()">Wyczyść wszystko</button>
+            <button class="btn-install" id="installBtn" style="display: none;" onclick="installApp()">
+                <img src="icon-192.png" alt="">
                 Zainstaluj aplikację
             </button>
         </div>
-        <div class="limit-selector">
-            <label for="limitDays">Wybierz limit dni:</label>
-            <select id="limitDays" onchange="updateLimit()">
-                <option value="548">548 dni</option>
-                <option value="540">540 dni</option>
-            </select>
-        </div>
         <div id="personsContainer"></div>
+        <footer>
+            Kalkulator ma charakter pomocniczy i nie stanowi porady prawnej. Wiążąca jest dokumentacja
+            okresów skierowania. Wyjątek: zastępstwo nieobecnego pracownika — do 36 miesięcy w sposób ciągły
+            (art. 20 ust. 5), kolejne skierowanie nie wcześniej niż po 36 miesiącach (art. 20 ust. 6).
+        </footer>
     </div>
+    <script src="logic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pl.js"></script>
     <script>
-        let LIMIT_IN_DAYS = 548;
+        var STORAGE_KEY = 'kalkulator-limitow-v2';
+        var L = window.LimitLogic;
+        var deferredPrompt = null;
 
-        const dateDiffInDays = (date1, date2) => {
-            const MS_PER_DAY = 1000 * 60 * 60 * 24;
-            const diffTime = Math.abs(date2.getTime() - date1.getTime());
-            return Math.floor(diffTime / MS_PER_DAY) + 1;
-        };
-
-        function updateLimit() {
-            const limitSelector = document.getElementById('limitDays');
-            LIMIT_IN_DAYS = parseInt(limitSelector.value, 10);
+        function esc(value) {
+            var div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
         }
 
-        function addPerson() {
-            const personsContainer = document.getElementById('personsContainer');
-            const personSection = document.createElement('div');
-            personSection.className = 'person-section';
+        function initDateInputs(scope) {
+            if (typeof flatpickr === 'function') {
+                scope.querySelectorAll('.flat-date').forEach(function (input) {
+                    if (!input._flatpickr) {
+                        flatpickr(input, { dateFormat: 'Y-m-d', locale: 'pl', allowInput: true });
+                    }
+                });
+            }
+        }
 
-            personSection.innerHTML = `
-                <div class="person-header">
-                    <input type="text" class="personFullName" placeholder="Imię i Nazwisko" required>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data Rozpoczęcia</th>
-                            <th>Data Zakończenia</th>
-                            <th>Wykorzystane Dni</th>
-                            <th style="width: 50px;">Akcja</th>
-                        </tr>
-                    </thead>
-                    <tbody class="contractsTableBody">
-                        <tr>
-                            <td><input type="text" class="startDate" required></td>
-                            <td><input type="text" class="endDate" required></td>
-                            <td class="daysUsed">-</td>
-                            <td><button class="btn-remove" onclick="removeRow(this)">Usuń</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button class="btn-add" onclick="addRow(this)">+ Dodaj Okres</button>
-                <button class="btn-calculate" onclick="calculateAllLimits()">OBLICZ WSZYSTKIE LIMITY</button>
-                <button class="btn-clear" onclick="clearAll()">Wyczyść wszystko</button>
-                <div class="results-section" style="display: none;">
-                    <h3>Wyniki Kalkulacji</h3>
-                    <div class="resultsContent"></div>
-                </div>
-            `;
+        function rowTemplate(row) {
+            row = row || {};
+            return '<tr>' +
+                '<td><input type="text" class="flat-date startDate" value="' + esc(row.start || '') + '" placeholder="RRRR-MM-DD"></td>' +
+                '<td><input type="text" class="flat-date endDate" value="' + esc(row.end || '') + '" placeholder="RRRR-MM-DD"></td>' +
+                '<td class="daysUsed">-</td>' +
+                '<td class="monthsUsed">-</td>' +
+                '<td><button class="btn-remove" onclick="removeRow(this)">Usuń</button></td>' +
+                '</tr>';
+        }
 
-            personsContainer.appendChild(personSection);
+        function createPersonSection(data) {
+            data = data || {};
+            var section = document.createElement('div');
+            section.className = 'person-section';
+            section.innerHTML =
+                '<div class="person-header">' +
+                    '<input type="text" class="personFullName" placeholder="Imię i nazwisko" value="' + esc(data.name || '') + '">' +
+                    '<input type="text" class="personEmployer" placeholder="Pracodawca użytkownik" value="' + esc(data.employer || '') + '">' +
+                '</div>' +
+                '<label class="zastepstwo-label">' +
+                    '<input type="checkbox" class="zastepstwoMode"' + (data.zastepstwo ? ' checked' : '') + '>' +
+                    'Zastępstwo nieobecnego pracownika (limit ciągły 36 mies. — art. 20 ust. 5)' +
+                '</label>' +
+                '<div class="table-scroll"><table>' +
+                    '<thead><tr>' +
+                        '<th>Data rozpoczęcia</th>' +
+                        '<th>Data zakończenia</th>' +
+                        '<th>Dni</th>' +
+                        '<th>Miesiące</th>' +
+                        '<th style="width: 70px;">Akcja</th>' +
+                    '</tr></thead>' +
+                    '<tbody class="contractsTableBody">' +
+                        rowTemplate(data.rows && data.rows[0]) +
+                    '</tbody>' +
+                '</table></div>' +
+                '<div class="person-actions">' +
+                    '<button class="btn-add" onclick="addRow(this)">+ Dodaj Okres</button>' +
+                    '<button class="btn-calculate" onclick="calculatePerson(this)">OBLICZ LIMIT</button>' +
+                    '<button class="btn-remove-person" onclick="removePerson(this)">Usuń osobę</button>' +
+                '</div>' +
+                '<div class="results-section">' +
+                    '<h3>Wyniki kalkulacji</h3>' +
+                    '<div class="resultsContent"></div>' +
+                '</div>';
 
-            flatpickr(personSection.querySelectorAll('.startDate'), { dateFormat: "Y-m-d", locale: "pl" });
-            flatpickr(personSection.querySelectorAll('.endDate'), { dateFormat: "Y-m-d", locale: "pl" });
+            var tbody = section.querySelector('.contractsTableBody');
+            (data.rows || []).slice(1).forEach(function (row) {
+                tbody.insertAdjacentHTML('beforeend', rowTemplate(row));
+            });
+
+            document.getElementById('personsContainer').appendChild(section);
+            initDateInputs(section);
+            return section;
+        }
+
+        function addPerson(data) {
+            createPersonSection(data);
+            saveState();
         }
 
         function addRow(button) {
-            const tableBody = button.closest('.person-section').querySelector('.contractsTableBody');
-            const newRow = tableBody.insertRow();
-            newRow.innerHTML = `
-                <td><input type="text" class="startDate" required></td>
-                <td><input type="text" class="endDate" required></td>
-                <td class="daysUsed">-</td>
-                <td><button class="btn-remove" onclick="removeRow(this)">Usuń</button></td>
-            `;
-            flatpickr(newRow.querySelector('.startDate'), { dateFormat: "Y-m-d", locale: "pl" });
-            flatpickr(newRow.querySelector('.endDate'), { dateFormat: "Y-m-d", locale: "pl" });
+            var section = button.closest('.person-section');
+            var tbody = section.querySelector('.contractsTableBody');
+            tbody.insertAdjacentHTML('beforeend', rowTemplate());
+            var row = tbody.lastElementChild;
+            initDateInputs(row);
+            saveState();
         }
 
         function removeRow(button) {
+            var tbody = button.closest('.contractsTableBody');
             button.closest('tr').remove();
+            if (!tbody.querySelector('tr')) {
+                tbody.insertAdjacentHTML('beforeend', rowTemplate());
+                initDateInputs(tbody);
+            }
+            saveState();
+        }
+
+        function removePerson(button) {
+            button.closest('.person-section').remove();
+            saveState();
         }
 
         function clearAll() {
-            const personsContainer = document.getElementById('personsContainer');
-            personsContainer.innerHTML = '';
+            if (!confirm('Usunąć wszystkie wprowadzone dane?')) return;
+            document.getElementById('personsContainer').innerHTML = '';
+            localStorage.removeItem(STORAGE_KEY);
+            addPerson();
         }
 
-        function calculateAllLimits() {
-            const personsContainer = document.getElementById('personsContainer');
-            const personSections = personsContainer.querySelectorAll('.person-section');
-
-            personSections.forEach(personSection => {
-                const personFullName = personSection.querySelector('.personFullName').value;
-                const tableBody = personSection.querySelector('.contractsTableBody');
-                const rows = tableBody.querySelectorAll('tr');
-                const resultsContent = personSection.querySelector('.resultsContent');
-                const resultsSection = personSection.querySelector('.results-section');
-
-                let totalDaysUsed = 0;
-
-                rows.forEach(row => {
-                    const startDateStr = row.querySelector('.startDate')?.value;
-                    const endDateStr = row.querySelector('.endDate')?.value;
-                    const daysUsedCell = row.querySelector('.daysUsed');
-
-                    if (!startDateStr || !endDateStr) {
-                        daysUsedCell.textContent = '-';
-                        return;
-                    }
-
-                    let startDate = new Date(startDateStr);
-                    let endDate = new Date(endDateStr);
-
-                    if (startDate > endDate) {
-                        alert(`Błąd danych dla ${personFullName}: Data rozpoczęcia (${startDateStr}) jest późniejsza niż zakończenia (${endDateStr}).`);
-                        return;
-                    }
-
-                    const days = dateDiffInDays(startDate, endDate);
-                    totalDaysUsed += days;
-                    daysUsedCell.textContent = `${days} dni`;
-                });
-
-                const remainingDays = LIMIT_IN_DAYS - totalDaysUsed;
-                let resultHtml = `
-                    <div>
-                        <h4>${personFullName}</h4>
-                        <p>Wykorzystane dni: ${totalDaysUsed}</p>
-                        <p>Pozostało dni: ${remainingDays}</p>
-                    </div>
-                `;
-
-                if (remainingDays < 0) {
-                    resultHtml += `<p style="color: var(--danger-color);">Limit przekroczony o ${Math.abs(remainingDays)} dni!</p>`;
-                    resultsSection.className = 'results-section result-exceeded';
-                } else {
-                    resultsSection.className = 'results-section result-ok';
-                }
-
-                resultsContent.innerHTML = resultHtml;
-                resultsSection.style.display = 'block';
+        function getRows(section) {
+            return Array.prototype.map.call(section.querySelectorAll('.contractsTableBody tr'), function (tr) {
+                return {
+                    start: tr.querySelector('.startDate').value,
+                    end: tr.querySelector('.endDate').value
+                };
             });
         }
 
-        function installApp() {
-            alert('Funkcja instalacji aplikacji jest w trakcie rozwoju. Wkrótce będzie dostępna!');
+        function markInvalidInputs(section, errorIndexes) {
+            section.querySelectorAll('.contractsTableBody tr').forEach(function (tr, idx) {
+                var invalid = errorIndexes.indexOf(idx) !== -1;
+                tr.querySelector('.startDate').classList.toggle('invalid', invalid);
+                tr.querySelector('.endDate').classList.toggle('invalid', invalid);
+            });
         }
 
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./service-worker.js').then(
-              (registration) => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-              },
-              (err) => {
-                console.log('ServiceWorker registration failed: ', err);
-              }
-            );
-          });
+        function renderResults(section, data) {
+            var results = section.querySelector('.results-section');
+            var content = section.querySelector('.resultsContent');
+            var name = section.querySelector('.personFullName').value.trim() || 'Osoba';
+            var employer = section.querySelector('.personEmployer').value.trim();
+            var zastepstwo = section.querySelector('.zastepstwoMode').checked;
+            var html = '';
+
+            if (data.errors.length) {
+                results.className = 'results-section result-warn';
+                results.style.display = 'block';
+                html += '<span class="badge badge-warn">BŁĄD DANYCH</span>';
+                html += '<ul class="error-list">' + data.errors.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>';
+                content.innerHTML = html;
+                return;
+            }
+
+            html += '<h4 style="margin: 0 0 4px;">' + esc(name) +
+                (employer ? ' <small style="font-weight: 400; color: #666;">— ' + esc(employer) + '</small>' : '') + '</h4>';
+
+            var cw = data.currentWindow;
+            if (zastepstwo && data.zastepstwo) {
+                var violated = data.zastepstwo.violated;
+                html += violated
+                    ? '<span class="badge badge-exceeded">LIMIT ZASTĘPSTWA PRZEKROCZONY</span>'
+                    : '<span class="badge badge-ok">TRYB ZASTĘPSTWA — OK</span>';
+                html += '<p class="result-line">Tryb zastępstwa: każdy <strong>ciągły</strong> okres skierowania może trwać maksymalnie ' +
+                    L.ZASTEPOSTWO_MAX_MONTHS + ' miesięcy (art. 20 ust. 5).</p>';
+                data.zastepstwo.blocks.forEach(function (block, idx) {
+                    html += '<p class="result-line">Blok ciągły ' + (idx + 1) + ': ' +
+                        L.formatMonthIndex(L.monthIndex(block.start)) + ' – ' + L.formatMonthIndex(L.monthIndex(block.end)) +
+                        ' → <strong>' + block.months + ' mies.</strong>' +
+                        (block.violated ? ' <span class="text-danger">— przekroczenie!</span>' : '') + '</p>';
+                });
+                html += '<p class="result-line" style="font-size: 0.85rem; color: #666;">Po zakończeniu zastępstwa kolejne skierowanie ' +
+                    'do tego samego pracodawcy użytkownika najwcześniej po 36 miesiącach (art. 20 ust. 6).</p>';
+            } else {
+                var exceeded = data.exceeded;
+                html += exceeded
+                    ? '<span class="badge badge-exceeded">LIMIT PRZEKROCZONY</span>'
+                    : (cw.remaining <= 0
+                        ? '<span class="badge badge-warn">LIMIT WYCZERPANY (W OBECNYM OKNIE)</span>'
+                        : '<span class="badge badge-ok">W LIMICIE</span>');
+
+                html += '<p class="result-line">Ostatnie 36 miesięcy (' + L.formatMonthIndex(cw.startMi) + ' – ' +
+                    L.formatMonthIndex(cw.endMi) + '): <span class="highlight">' + cw.used + ' / ' + L.LIMIT_MONTHS + ' mies.</span>' +
+                    (cw.remaining > 0
+                        ? ' — pozostało: <span class="highlight">' + cw.remaining + ' mies.</span>'
+                        : ' <span class="text-danger">— brak dostępnego limitu</span>') + '</p>';
+
+                html += '<p class="result-line">Najgorsze okno 36-miesięczne w historii: <span class="highlight">' +
+                    data.maxWindow.max + ' / ' + L.LIMIT_MONTHS + ' mies.</span>' +
+                    (data.maxWindow.startMi !== null ? ' (okno: ' + L.formatMonthIndex(data.maxWindow.startMi) + ' – ' +
+                        L.formatMonthIndex(data.maxWindow.endMi) + ')' : '') +
+                    (exceeded ? ' <span class="text-danger"><strong>— przekroczenie!</strong></span>' : '') + '</p>';
+
+                if (data.nextStartMi !== null) {
+                    html += '<p class="result-line">Najwcześniejszy dopuszczalny początek kolejnego miesiąca pracy: <span class="highlight">' +
+                        L.formatMonthIndex(data.nextStartMi) + '</span></p>';
+                }
+            }
+
+            html += '<p class="result-line">Miesiące pracy łącznie (cała historia): <span class="highlight">' +
+                data.totalMonths + '</span></p>';
+            if (data.ranges.length) {
+                html += '<ul class="ranges-list">' + data.ranges.map(function (r) {
+                    return '<li>' + L.formatMonthIndex(r.from) + ' – ' + L.formatMonthIndex(r.to) + ' (' + r.count + ' mies.)</li>';
+                }).join('') + '</ul>';
+            }
+
+            if (data.warnings.length) {
+                html += '<ul class="warning-list">' + data.warnings.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>';
+            }
+
+            results.className = 'results-section ' + (data.exceeded ? 'result-exceeded' : 'result-ok');
+            results.style.display = 'block';
+            content.innerHTML = html;
         }
+
+        function calculatePerson(button) {
+            var section = button.closest('.person-section');
+            var rows = getRows(section);
+            var zastepstwo = section.querySelector('.zastepstwoMode').checked;
+
+            var errorIndexes = [];
+            rows.forEach(function (row, idx) {
+                var tr = section.querySelectorAll('.contractsTableBody tr')[idx];
+                var daysCell = tr.querySelector('.daysUsed');
+                var monthsCell = tr.querySelector('.monthsUsed');
+                var s = L.parseDate(row.start);
+                var e = L.parseDate(row.end);
+                if (!s || !e || s > e) {
+                    daysCell.textContent = '-';
+                    monthsCell.textContent = '-';
+                    errorIndexes.push(idx);
+                    return;
+                }
+                daysCell.textContent = L.daysBetweenInclusive(s, e) + ' dni';
+                monthsCell.textContent = (L.monthIndex(e) - L.monthIndex(s) + 1) + ' mies.';
+            });
+            markInvalidInputs(section, errorIndexes);
+
+            var data = L.evaluateContracts(rows, { zastepstwo: zastepstwo });
+            renderResults(section, data);
+            saveState();
+        }
+
+        function calculateAll() {
+            document.querySelectorAll('.person-section').forEach(function (section) {
+                calculatePerson(section.querySelector('.btn-calculate'));
+            });
+        }
+
+        function getState() {
+            return {
+                persons: Array.prototype.map.call(document.querySelectorAll('.person-section'), function (section) {
+                    return {
+                        name: section.querySelector('.personFullName').value,
+                        employer: section.querySelector('.personEmployer').value,
+                        zastepstwo: section.querySelector('.zastepstwoMode').checked,
+                        rows: getRows(section)
+                    };
+                })
+            };
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(getState()));
+            } catch (e) { /* pamięć niedostępna — pomijamy zapis */ }
+        }
+
+        function restoreState() {
+            var data = null;
+            try {
+                data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            } catch (e) { /* uszkodzone dane — startujemy pusto */ }
+            if (data && Array.isArray(data.persons) && data.persons.length) {
+                data.persons.forEach(function (person) {
+                    createPersonSection(person);
+                });
+                calculateAll();
+            } else {
+                addPerson();
+            }
+        }
+
+        document.getElementById('personsContainer').addEventListener('change', saveState);
+        document.getElementById('personsContainer').addEventListener('input', saveState);
+
+        function installApp() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function () {
+                deferredPrompt = null;
+                document.getElementById('installBtn').style.display = 'none';
+            });
+        }
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'flex';
+        });
+
+        window.addEventListener('appinstalled', function () {
+            document.getElementById('installBtn').style.display = 'none';
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('./service-worker.js').then(function (registration) {
+                    console.log('ServiceWorker zarejestrowany, scope: ', registration.scope);
+                }, function (err) {
+                    console.log('Rejestracja ServiceWorkera nie powiodła się: ', err);
+                });
+            });
+        }
+
+        restoreState();
     </script>
 </body>
 </html>

@@ -1,20 +1,25 @@
 {
   "name": "Kalkulator Limitu Pracy Tymczasowej",
   "short_name": "Kalkulator Limitów",
-  "start_url": "./kalkulator%20limitów.html",
+  "description": "Kalkulator limitu pracy tymczasowej 18/36 zgodny z art. 20 ustawy o zatrudnianiu pracowników tymczasowych",
+  "lang": "pl",
+  "start_url": "./limitscalculator.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
   "icons": [
     {
-      "src": "icon.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "icon.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
