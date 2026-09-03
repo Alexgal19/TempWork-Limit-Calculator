@@ -19,14 +19,26 @@ pracodawcy użytkownika.
 
 ## Jak liczy kalkulator
 
-1. Z każdego okresu (umowy) wyznaczane są miesiące kalendarzowe, w których występowała praca
-   (miesiąc liczony raz, nawet przy nakładających się okresach).
-2. Limit sprawdzany jest w **każdym** oknie 36 kolejnych miesięcy (okno kroczące) —
-   wynik pokazuje najgorsze znalezione okno.
-3. Dodatkowo raportowany jest stan bieżącego okna (ostatnie 36 miesięcy), pozostały limit
-   oraz najwcześniejszy dopuszczalny początek kolejnego miesiąca pracy, gdy limit jest wyczerpany.
+Aplikacja pokazuje wyniki w dwóch ujęciach:
 
-Kolumna „Dni" w tabeli ma charakter wyłącznie informacyjny — przepisy operują miesiącami.
+**1. Podsumowanie okresowe (limit dniowy, domyślny widok)**
+
+- okresy pracy grupowane są w **okresy 36-miesięczne** liczone od pierwszego dnia pracy
+  w danym cyklu (np. 16.08.2023 – 15.08.2026),
+- w każdym okresie sumowane są dni umów i porównywane z limitem **540 dni**
+  (możliwa zmiana na 548),
+- dla każdego okresu pokazywane jest: wykorzystane dni, pozostałe dni oraz data,
+  do której można przedłużyć umowę,
+- na końcu sumaryczne „Łącznie wykorzystanych dni".
+
+**2. Analiza wg przepisów (art. 20 — sekcja rozwijana)**
+
+- limit **18 miesięcy w każdym ruchomym oknie 36 kolejnych miesięcy** — miesiącami
+  kalendarzowymi (miesiąc z choć 1 dniem pracy = pełny miesiąc),
+- limit wspólny dla wszystkich agencji i form zatrudnienia (umowa o pracę + umowy
+  cywilnoprawne),
+- pokazywane: stan bieżącego okna, najgorsze okno w historii, najwcześniejszy dopuszczalny
+  powrót, tryb zastępstwa (art. 20 ust. 5–6).
 
 ## Funkcje
 

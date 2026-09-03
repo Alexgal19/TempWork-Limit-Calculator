@@ -124,6 +124,46 @@ check('blocks touching merge', L.getContinuousBlocks([
   { start: '2023-07-01', end: '2023-12-31' }
 ]).length, 1);
 
+// --- buildCycles: dane ze screena aplikacji firmowej ---
+// Okres 1: 16.08.2023 - 15.08.2026, umowa 16.08.2023-31.01.2025 = 535 dni,
+// zostalo 5 dni, przedluzenie do 05.02.2025
+// Okres 2: 26.08.2026 - 25.08.2029, umowa 26.08.2026-08.09.2026 = 14 dni,
+// przedluzenie do 16.02.2028, lacznie 549 dni
+const screenshot = L.buildCycles([
+  { start: '2023-08-16', end: '2025-01-31' },
+  { start: '2026-08-26', end: '2026-09-08' }
+], 540);
+check('screenshot cycle count', screenshot.cycles.length, 2);
+check('screenshot cycle1 window', [
+  L.formatDatePl(screenshot.cycles[0].start),
+  L.formatDatePl(screenshot.cycles[0].windowEnd)
+], ['16.08.2023', '15.08.2026']);
+check('screenshot cycle1 used/remaining', [
+  screenshot.cycles[0].usedDays,
+  screenshot.cycles[0].remainingDays
+], [535, 5]);
+check('screenshot cycle1 extend to', L.formatDatePl(screenshot.cycles[0].extendToDate), '05.02.2025');
+check('screenshot cycle2 window', [
+  L.formatDatePl(screenshot.cycles[1].start),
+  L.formatDatePl(screenshot.cycles[1].windowEnd)
+], ['26.08.2026', '25.08.2029']);
+check('screenshot cycle2 used/extend', [
+  screenshot.cycles[1].usedDays,
+  L.formatDatePl(screenshot.cycles[1].extendToDate)
+], [14, '16.02.2028']);
+check('screenshot total days', screenshot.totalDays, 549);
+
+// --- buildCycles: przekroczenie limitu w okresie ---
+const over = L.buildCycles([
+  { start: '2023-01-01', end: '2024-12-31' }
+], 540);
+check('cycle exceeded days', [over.cycles[0].usedDays, over.cycles[0].remainingDays, over.cycles[0].exceededDays], [731, -191, 191]);
+check('cycle exceeded no extend date', over.cycles[0].extendToDate, null);
+
+// --- addMonths clamping (koniec miesiaca) ---
+check('addMonths clamp jan31 -> feb28', L.formatDate(L.addMonths(new Date(2023, 0, 31), 1)), '2023-02-28');
+check('addMonths 36 keeps day', L.formatDate(L.addMonths(new Date(2023, 7, 16), 36)), '2026-08-16');
+
 if (failures) {
   console.log('\n' + failures + ' test(s) FAILED');
   process.exit(1);

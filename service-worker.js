@@ -1,4 +1,4 @@
-var CACHE_NAME = 'kalkulator-limitow-v2';
+var CACHE_NAME = 'kalkulator-limitow-v3';
 
 var PRECACHE_URLS = [
   './',

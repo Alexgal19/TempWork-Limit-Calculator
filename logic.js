@@ -4,6 +4,8 @@
   var LIMIT_MONTHS = 18;
   var WINDOW_MONTHS = 36;
   var ZASTEPOSTWO_MAX_MONTHS = 36;
+  var CYCLE_MONTHS = 36;
+  var COMPANY_LIMIT_DAYS = 540;
   var PL_MONTHS = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
 
   function monthIndex(date) {
@@ -234,13 +236,81 @@
     return result;
   }
 
+  function addMonths(date, n) {
+    var result = new Date(date.getFullYear(), date.getMonth() + n, 1);
+    var daysInTargetMonth = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+    result.setDate(Math.min(date.getDate(), daysInTargetMonth));
+    return result;
+  }
+
+  function addDays(date, n) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + n);
+  }
+
+  function formatDatePl(date) {
+    var dd = String(date.getDate()).padStart(2, '0');
+    var mm = String(date.getMonth() + 1).padStart(2, '0');
+    return dd + '.' + mm + '.' + date.getFullYear();
+  }
+
+  function buildCycles(rows, limitDays) {
+    var limit = typeof limitDays === 'number' && limitDays > 0 ? limitDays : COMPANY_LIMIT_DAYS;
+
+    var contracts = rows
+      .map(function (row, idx) {
+        var s = parseDate(row.start);
+        var e = parseDate(row.end);
+        return s && e && s <= e
+          ? { idx: idx, start: s, end: e, days: daysBetweenInclusive(s, e) }
+          : null;
+      })
+      .filter(Boolean)
+      .sort(function (a, b) { return a.start - b.start; });
+
+    var cycles = [];
+    contracts.forEach(function (contract) {
+      var last = cycles[cycles.length - 1];
+      if (!last || contract.start > last.windowEnd) {
+        cycles.push({
+          start: contract.start,
+          windowEnd: addDays(addMonths(contract.start, CYCLE_MONTHS), -1),
+          contracts: [],
+          lastEnd: null
+        });
+      }
+      var cycle = cycles[cycles.length - 1];
+      cycle.contracts.push(contract);
+      if (!cycle.lastEnd || contract.end > cycle.lastEnd) {
+        cycle.lastEnd = contract.end;
+      }
+    });
+
+    var totalDays = 0;
+    cycles.forEach(function (cycle) {
+      cycle.usedDays = cycle.contracts.reduce(function (sum, c) { return sum + c.days; }, 0);
+      cycle.remainingDays = limit - cycle.usedDays;
+      cycle.exceededDays = cycle.remainingDays < 0 ? -cycle.remainingDays : 0;
+      cycle.extendToDate = cycle.remainingDays >= 0 ? addDays(cycle.lastEnd, cycle.remainingDays) : null;
+      totalDays += cycle.usedDays;
+    });
+
+    return {
+      limitDays: limit,
+      cycles: cycles,
+      totalDays: totalDays
+    };
+  }
+
   var api = {
     LIMIT_MONTHS: LIMIT_MONTHS,
     WINDOW_MONTHS: WINDOW_MONTHS,
     ZASTEPOSTWO_MAX_MONTHS: ZASTEPOSTWO_MAX_MONTHS,
+    CYCLE_MONTHS: CYCLE_MONTHS,
+    COMPANY_LIMIT_DAYS: COMPANY_LIMIT_DAYS,
     monthIndex: monthIndex,
     parseDate: parseDate,
     formatDate: formatDate,
+    formatDatePl: formatDatePl,
     formatMonthIndex: formatMonthIndex,
     daysBetweenInclusive: daysBetweenInclusive,
     getWorkedMonths: getWorkedMonths,
@@ -249,7 +319,10 @@
     nextPossibleStart: nextPossibleStart,
     mergeMonthRanges: mergeMonthRanges,
     getContinuousBlocks: getContinuousBlocks,
-    evaluateContracts: evaluateContracts
+    evaluateContracts: evaluateContracts,
+    addMonths: addMonths,
+    addDays: addDays,
+    buildCycles: buildCycles
   };
 
   if (typeof module !== 'undefined' && module.exports) {

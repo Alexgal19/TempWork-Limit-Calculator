@@ -317,6 +317,80 @@
             .container { padding: 20px; }
             h1 { font-size: 1.6rem; }
         }
+
+        .limit-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .limit-selector select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .cycle-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 14px;
+            background: #fff;
+        }
+
+        .cycle-title {
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        .cycle-summary {
+            background: #EAF1FB;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #1a56b0;
+        }
+
+        .cycle-summary-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .cycle-summary-row.center {
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .extend-date {
+            color: #1a56b0;
+            font-weight: 500;
+        }
+
+        .total-summary {
+            margin-top: 18px;
+        }
+
+        .total-summary .cycle-summary {
+            font-weight: 500;
+        }
+
+        details.legal {
+            margin-top: 14px;
+            border-top: 1px dashed #ccc;
+            padding-top: 10px;
+        }
+
+        details.legal summary {
+            cursor: pointer;
+            font-weight: 500;
+            color: #444;
+        }
     </style>
 </head>
 <body>
@@ -332,6 +406,13 @@
         </div>
         <div class="btn-group">
             <button class="btn-add" onclick="addPerson()">+ Dodaj Osobę</button>
+            <div class="limit-selector">
+                <label for="limitDays">Limit dni w okresie 36 mies.:</label>
+                <select id="limitDays" onchange="updateLimit()">
+                    <option value="540">540 dni</option>
+                    <option value="548">548 dni</option>
+                </select>
+            </div>
             <button class="btn-clear" onclick="clearAll()">Wyczyść wszystko</button>
             <button class="btn-install" id="installBtn" style="display: none;" onclick="installApp()">
                 <img src="icon-192.png" alt="">
@@ -478,27 +559,46 @@
             });
         }
 
-        function renderResults(section, data) {
-            var results = section.querySelector('.results-section');
-            var content = section.querySelector('.resultsContent');
-            var name = section.querySelector('.personFullName').value.trim() || 'Osoba';
-            var employer = section.querySelector('.personEmployer').value.trim();
-            var zastepstwo = section.querySelector('.zastepstwoMode').checked;
+        function renderCycles(cyclesData) {
             var html = '';
+            cyclesData.cycles.forEach(function (cycle, idx) {
+                html += '<div class="cycle-card">' +
+                    '<div class="cycle-title">Okres ' + (idx + 1) + ': ' +
+                        L.formatDatePl(cycle.start) + ' - ' + L.formatDatePl(cycle.windowEnd) + '</div>' +
+                    '<div class="table-scroll"><table>' +
+                        '<thead><tr><th>Data początkowa</th><th>Data końcowa</th><th style="text-align: right;">Wykorzystane dni</th></tr></thead>' +
+                        '<tbody>' +
+                        cycle.contracts.map(function (c) {
+                            return '<tr><td>' + L.formatDatePl(c.start) + '</td><td>' + L.formatDatePl(c.end) +
+                                '</td><td style="text-align: right;">' + c.days + ' dni</td></tr>';
+                        }).join('') +
+                        '</tbody></table></div>' +
+                    '<div class="cycle-summary">' +
+                        '<div class="cycle-summary-row">' +
+                            '<span>Wykorzystano: <strong>' + cycle.usedDays + ' dni</strong> z dostępnego limitu (' + cyclesData.limitDays + ')</span>' +
+                            (cycle.remainingDays >= 0
+                                ? '<span>Pozostało: <strong>' + cycle.remainingDays + ' dni</strong></span>'
+                                : '<span class="text-danger">Przekroczono o: <strong>' + cycle.exceededDays + ' dni</strong></span>') +
+                        '</div>' +
+                        (cycle.remainingDays >= 0
+                            ? '<div class="cycle-summary-row center">Można przedłużyć umowę do: <span class="extend-date">' +
+                                L.formatDatePl(cycle.extendToDate) + '</span></div>'
+                            : '') +
+                    '</div>' +
+                '</div>';
+            });
+            html += '<div class="total-summary"><h3 style="margin: 0 0 8px;">Całkowite podsumowanie</h3>' +
+                '<div class="cycle-summary"><div class="cycle-summary-row">' +
+                    '<span>Łącznie wykorzystanych dni: <strong>' + cyclesData.totalDays + '</strong></span>' +
+                    '<span>Liczba okresów 36-miesięcznych: <strong>' + cyclesData.cycles.length + '</strong></span>' +
+                '</div></div></div>';
+            return html;
+        }
 
-            if (data.errors.length) {
-                results.className = 'results-section result-warn';
-                results.style.display = 'block';
-                html += '<span class="badge badge-warn">BŁĄD DANYCH</span>';
-                html += '<ul class="error-list">' + data.errors.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>';
-                content.innerHTML = html;
-                return;
-            }
-
-            html += '<h4 style="margin: 0 0 4px;">' + esc(name) +
-                (employer ? ' <small style="font-weight: 400; color: #666;">— ' + esc(employer) + '</small>' : '') + '</h4>';
-
+        function renderLegalAnalysis(data, zastepstwo) {
+            var html = '';
             var cw = data.currentWindow;
+
             if (zastepstwo && data.zastepstwo) {
                 var violated = data.zastepstwo.violated;
                 html += violated
@@ -538,19 +638,46 @@
                     html += '<p class="result-line">Najwcześniejszy dopuszczalny początek kolejnego miesiąca pracy: <span class="highlight">' +
                         L.formatMonthIndex(data.nextStartMi) + '</span></p>';
                 }
-            }
 
-            html += '<p class="result-line">Miesiące pracy łącznie (cała historia): <span class="highlight">' +
-                data.totalMonths + '</span></p>';
-            if (data.ranges.length) {
-                html += '<ul class="ranges-list">' + data.ranges.map(function (r) {
-                    return '<li>' + L.formatMonthIndex(r.from) + ' – ' + L.formatMonthIndex(r.to) + ' (' + r.count + ' mies.)</li>';
-                }).join('') + '</ul>';
+                html += '<p class="result-line">Miesiące pracy łącznie (cała historia): <span class="highlight">' +
+                    data.totalMonths + '</span></p>';
+                if (data.ranges.length) {
+                    html += '<ul class="ranges-list">' + data.ranges.map(function (r) {
+                        return '<li>' + L.formatMonthIndex(r.from) + ' – ' + L.formatMonthIndex(r.to) + ' (' + r.count + ' mies.)</li>';
+                    }).join('') + '</ul>';
+                }
             }
 
             if (data.warnings.length) {
                 html += '<ul class="warning-list">' + data.warnings.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>';
             }
+
+            return html;
+        }
+
+        function renderResults(section, data, cyclesData) {
+            var results = section.querySelector('.results-section');
+            var content = section.querySelector('.resultsContent');
+            var name = section.querySelector('.personFullName').value.trim() || 'Osoba';
+            var employer = section.querySelector('.personEmployer').value.trim();
+            var zastepstwo = section.querySelector('.zastepstwoMode').checked;
+            var html = '';
+
+            if (data.errors.length) {
+                results.className = 'results-section result-warn';
+                results.style.display = 'block';
+                html += '<span class="badge badge-warn">BŁĄD DANYCH</span>';
+                html += '<ul class="error-list">' + data.errors.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>';
+                content.innerHTML = html;
+                return;
+            }
+
+            html += '<h4 style="margin: 0 0 4px;">' + esc(name) +
+                (employer ? ' <small style="font-weight: 400; color: #666;">— ' + esc(employer) + '</small>' : '') + '</h4>';
+
+            html += renderCycles(cyclesData);
+            html += '<details class="legal"><summary>Analiza wg przepisów (art. 20 — miesiące kalendarzowe)</summary>' +
+                '<div style="padding-top: 10px;">' + renderLegalAnalysis(data, zastepstwo) + '</div></details>';
 
             results.className = 'results-section ' + (data.exceeded ? 'result-exceeded' : 'result-ok');
             results.style.display = 'block';
@@ -581,8 +708,19 @@
             markInvalidInputs(section, errorIndexes);
 
             var data = L.evaluateContracts(rows, { zastepstwo: zastepstwo });
-            renderResults(section, data);
+            var cyclesData = L.buildCycles(rows, getLimitDays());
+            renderResults(section, data, cyclesData);
             saveState();
+        }
+
+        function getLimitDays() {
+            var select = document.getElementById('limitDays');
+            return parseInt(select && select.value, 10) || L.COMPANY_LIMIT_DAYS;
+        }
+
+        function updateLimit() {
+            saveState();
+            calculateAll();
         }
 
         function calculateAll() {
@@ -593,6 +731,7 @@
 
         function getState() {
             return {
+                limitDays: getLimitDays(),
                 persons: Array.prototype.map.call(document.querySelectorAll('.person-section'), function (section) {
                     return {
                         name: section.querySelector('.personFullName').value,
@@ -615,6 +754,10 @@
             try {
                 data = JSON.parse(localStorage.getItem(STORAGE_KEY));
             } catch (e) { /* uszkodzone dane — startujemy pusto */ }
+            if (data && (typeof data.limitDays === 'number')) {
+                var select = document.getElementById('limitDays');
+                if (select) select.value = String(data.limitDays);
+            }
             if (data && Array.isArray(data.persons) && data.persons.length) {
                 data.persons.forEach(function (person) {
                     createPersonSection(person);
