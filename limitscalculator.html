@@ -426,7 +426,7 @@
             (art. 20 ust. 5), kolejne skierowanie nie wcześniej niż po 36 miesiącach (art. 20 ust. 6).
         </footer>
     </div>
-    <script src="logic.js"></script>
+    <script src="logic.js?v=3"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pl.js"></script>
     <script>
@@ -792,7 +792,7 @@
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
-                navigator.serviceWorker.register('./service-worker.js').then(function (registration) {
+                navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(function (registration) {
                     console.log('ServiceWorker zarejestrowany, scope: ', registration.scope);
                 }, function (err) {
                     console.log('Rejestracja ServiceWorkera nie powiodła się: ', err);

@@ -1,4 +1,4 @@
-var CACHE_NAME = 'kalkulator-limitow-v3';
+var CACHE_NAME = 'kalkulator-limitow-v4';
 
 var PRECACHE_URLS = [
   './',
@@ -48,16 +48,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (request.mode === 'navigate') {
+  var isSameOrigin = new URL(request.url).origin === self.location.origin;
+
+  if (request.mode === 'navigate' || isSameOrigin) {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          var copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          if (response && response.ok) {
+            var copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
         .catch(() =>
-          caches.match(request).then((cached) => cached || caches.match('./limitscalculator.html'))
+          caches.match(request, { ignoreSearch: true }).then((cached) => {
+            if (cached) return cached;
+            if (request.mode === 'navigate') {
+              return caches.match('./limitscalculator.html', { ignoreSearch: true });
+            }
+            return undefined;
+          })
         )
     );
     return;
